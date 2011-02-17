@@ -33,7 +33,7 @@ static void jniThrowException(JNIEnv* env, const char* exc, const char* msg = NU
     env->ThrowNew(excClazz, msg);
 }
 
-static jint runBidi(JNIEnv* env, jobject obj, jint dir, jcharArray chsArray, 
+static jint runBidi(JNIEnv* env, jclass c, jint dir, jcharArray chsArray,
                     jbyteArray infoArray, int n, jboolean haveInfo)
 {
     // Parameters are checked on java side

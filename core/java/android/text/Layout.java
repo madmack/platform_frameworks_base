@@ -305,13 +305,13 @@ public abstract class Layout {
                     if (spans[n] instanceof LeadingMarginSpan) {
                         LeadingMarginSpan margin = (LeadingMarginSpan) spans[n];
 
-                        if (dir == DIR_RIGHT_TO_LEFT) {
-                            margin.drawLeadingMargin(c, paint, right, dir, ltop,
-                                                     lbaseline, lbottom, buf,
-                                                     start, end, isFirstParaLine, this);
-                                
-                            right -= margin.getLeadingMargin(isFirstParaLine);
-                        } else {
+                        //if (dir == DIR_RIGHT_TO_LEFT) {
+                            //margin.drawLeadingMargin(c, paint, right, dir, ltop,
+                               //                      lbaseline, lbottom, buf,
+                             //                        start, end, isFirstParaLine, this);
+                           //     
+                         //   right -= margin.getLeadingMargin(isFirstParaLine);
+                       // } else {
                             margin.drawLeadingMargin(c, paint, left, dir, ltop,
                                                      lbaseline, lbottom, buf,
                                                      start, end, isFirstParaLine, this);
@@ -320,7 +320,7 @@ public abstract class Layout {
                             if (margin instanceof LeadingMarginSpan.LeadingMarginSpan2) {
                                 int count = ((LeadingMarginSpan.LeadingMarginSpan2)margin).getLeadingMarginLineCount();
                                 useMargin = count > i;
-                            }
+                            //}
                             left += margin.getLeadingMargin(useMargin);
                         }
                     }
@@ -1390,7 +1390,7 @@ public abstract class Layout {
             buf = null;
         } else {
             buf = TextUtils.obtain(end - start);
-            TextUtils.getChars(text, start, end, buf, 0);
+            TextUtils.getCharsDraw(text, start, end, buf, 0);
         }
 
         float h = 0;
@@ -1473,7 +1473,7 @@ public abstract class Layout {
 
         if (hasTabs) {
             buf = TextUtils.obtain(end - start);
-            TextUtils.getChars(text, start, end, buf, 0);
+            TextUtils.getCharsDraw(text, start, end, buf, 0);
         }
 
         float h = 0;
@@ -1619,7 +1619,7 @@ public abstract class Layout {
   
         if (hasTabs) {
             buf = TextUtils.obtain(end - start);
-            TextUtils.getChars(text, start, end, buf, 0);
+            TextUtils.getCharsDraw(text, start, end, buf, 0);
         }
 
         int len = end - start;
@@ -1823,6 +1823,36 @@ public abstract class Layout {
         /* package */ Directions(short[] dirs) {
             mDirections = dirs;
         }
+        
+        public static int baseDirection(Directions dir,int length) {
+            if (dir == DIRS_ALL_LEFT_TO_RIGHT) {
+                return DIR_LEFT_TO_RIGHT;
+            } else if (dir == DIRS_ALL_RIGHT_TO_LEFT) {
+                return DIR_RIGHT_TO_LEFT;
+            } 
+
+            int sum=0;
+            int lastSwitch=0;
+            int i=0;
+            while ((i+1) < dir.mDirections.length) {
+                sum+=dir.mDirections[i];//-lastSwitch;
+                sum-=dir.mDirections[i+1];//-dir.mDirections[i];
+                lastSwitch=dir.mDirections[i+1];
+                i+=2;
+            }
+
+            if ((i+1)==dir.mDirections.length) {
+                sum+=dir.mDirections[i];//-lastSwitch);
+            } else if (i==dir.mDirections.length) {
+                sum-=length-lastSwitch;
+            }
+
+            if (sum>=0) {
+                return DIR_LEFT_TO_RIGHT;
+            } else {
+                return DIR_RIGHT_TO_LEFT;
+            }
+        }
     }
 
     /**
@@ -1837,7 +1867,7 @@ public abstract class Layout {
      */
     public abstract int getEllipsisCount(int line);
 
-    /* package */ static class Ellipsizer implements CharSequence, GetChars {
+    /* package */ static class Ellipsizer implements CharSequence, GetChars ,GetCharsDraw {
         /* package */ CharSequence mText;
         /* package */ Layout mLayout;
         /* package */ int mWidth;
@@ -1846,6 +1876,17 @@ public abstract class Layout {
         public Ellipsizer(CharSequence s) {
             mText = s;
         }
+
+	//Arabic Support Addition
+        public char charAtDraw(int off) {
+            char[] buf = TextUtils.obtain(1);
+            getChars(off, off + 1, buf, 0);
+            char ret = buf[0];
+
+            TextUtils.recycle(buf);
+            return ret;
+        }
+
 
         public char charAt(int off) {
             char[] buf = TextUtils.obtain(1);
@@ -1856,7 +1897,7 @@ public abstract class Layout {
             return ret;
         }
 
-        public void getChars(int start, int end, char[] dest, int destoff) {
+         public void getChars(int start, int end, char[] dest, int destoff) {
             int line1 = mLayout.getLineForOffset(start);
             int line2 = mLayout.getLineForOffset(end);
 
@@ -1866,6 +1907,20 @@ public abstract class Layout {
                 mLayout.ellipsize(start, end, i, dest, destoff);
             }
         }
+
+	//Arabic Support Addition
+	public void getCharsDraw(int start, int end, char[] dest, int destoff) {
+            int line1 = mLayout.getLineForOffset(start);
+            int line2 = mLayout.getLineForOffset(end);
+
+            TextUtils.getCharsDraw(mText, start, end, dest, destoff);
+
+            for (int i = line1; i <= line2; i++) {
+                mLayout.ellipsize(start, end, i, dest, destoff);
+            }
+        }
+
+
 
         public int length() {
             return mText.length();
@@ -1958,4 +2013,3 @@ public abstract class Layout {
                                        new Directions(new short[] { 0, 32767 });
 
 }
-

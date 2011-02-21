@@ -19,7 +19,6 @@ package android.text;
 
 import com.ibm.icu.text.ArabicShaping;
 import com.ibm.icu.text.ArabicShapingException;
-//import com.ibm.icu.lang.*;
 
 /**
  * This class is used to shape Arabic letters in different formats
@@ -27,47 +26,41 @@ import com.ibm.icu.text.ArabicShapingException;
 public class ArShaper {
 
 
-	static boolean debugG = true;
-	static boolean myDebug = true;
+	static boolean debugG = false;
+	static boolean myDebug = false;
 	
-	static int shapingFlags = ArabicShaping.LETTERS_SHAPE | ArabicShaping.LAMALEF_AUTO;
+	static int shapingFlags = ArabicShaping.LETTERS_SHAPE | ArabicShaping.LAMALEF_NEAR;
 
-	/*public static boolean hasArabChars(String text) {
-		return Pattern.matches("[\u0600-\u06ff]|[\u0750-\u077f]|[\ufb50-\ufc3f]|[\ufe70-\ufefc]", 
-				text);
-		char[] glyphs = text.toCharArray();
-	      for (int i=0; i<glyphs.length; i++) {
-	        if (glyphs[i] >= 0x600 && glyphs[i] <= 0x6ff) return true;
-	        if (glyphs[i] >= 0x750 && glyphs[i] <= 0x77f) return true;
-	        if (glyphs[i] >= 0xfb50 && glyphs[i] <= 0xfc3f) return true;
-	        if (glyphs[i] >= 0xfe70 && glyphs[i] <= 0xfefc) return true;
-	      }
-	      return false;
-	}*/
-
+	public static int shapedLength(char[] text, final int start, final int length) {
+		char[] dest = new char[length];
+		ArabicShaping arShaper = new ArabicShaping(ArabicShaping.LETTERS_SHAPE);
+		int retlen = 0;
+		try {
+			retlen = arShaper.shape(text, start, length, dest, 0, length);
+		} catch (ArabicShapingException e) {
+			e.printStackTrace();
+		}
+		if (myDebug) System.out.println("shapedLength got + " + length + " and returning " + retlen);
+		return retlen;
+	}
 
 	public static int shaper(char[] mText, final int start, final int length, String info, boolean doResize) {
-		if (myDebug) System.out.println("calling shaper from " + info);
-		//if (myDebug) Thread.dumpStack();
+		
 		if (length==0) return 0;
 		int charCopied = 0;
-		//if (ArShaper.hasArabChars(new String(mText, start, length)))
-			//charCopied = ArShaper2.nativeShape(mText, start, length, 1);
+		
 		ArabicShaping arShaper;
-		if (doResize) arShaper = new ArabicShaping(ArabicShaping.LETTERS_SHAPE);
-		else arShaper = new ArabicShaping(shapingFlags);
+		//if (doResize) arShaper = new ArabicShaping(ArabicShaping.LETTERS_SHAPE);
+		//else arShaper = new ArabicShaping(shapingFlags);
+		arShaper = new ArabicShaping(ArabicShaping.LETTERS_SHAPE | ArabicShaping.LAMALEF_NEAR);
 		char[] shaped = new char[length];
 		try {
 			charCopied = arShaper.shape(mText, start, length, shaped, 0, length);
 		} catch (ArabicShapingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.arraycopy(shaped, 0, mText, start, charCopied);
-		if (myDebug) {
-			System.out.println("u_shapearabic function shaped " + charCopied + " chars");
-			System.out.println("done shaping: " + String.copyValueOf(mText));
-		}
+		
 		return charCopied;
 	}
 
@@ -79,13 +72,11 @@ public class ArShaper {
 		if (mText.length==0) return String.copyValueOf(mText);
 		
 		if (debugG) System.out.println("we're in char[], string: " + new String(mText));
-		//if (ArShaper.hasArabChars(new String(mText)))
-			//ArShaper2.nativeShape(mText, 0, mText.length, 1);
+		
 		ArabicShaping arShaper = new ArabicShaping(shapingFlags);
 		try {
 			arShaper.shape(mText, 0, mText.length);
 		} catch (ArabicShapingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String shaped = String.copyValueOf(mText);
@@ -106,20 +97,13 @@ public class ArShaper {
 
 		if (mText.length()==0) return mText.toString();
 		
-		//if (ArShaper.hasArabChars(shaped)) {
-			//ArShaper2 arShaper = new ArShaper2();
-			//shaped = arShaper.nativeShape(mText.toString(), mText.toString().length(), 1);// }
-		
 		ArabicShaping arShaper = new ArabicShaping(shapingFlags);
 		try {
 			return arShaper.shape(mText.toString());
 		} catch (ArabicShapingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//if (debugG) System.out.println("and returning: " + shaped);
 		return mText.toString();
-		//return shaped;
 
 	}
 
@@ -136,20 +120,9 @@ public class ArShaper {
 		try {
 			return arShaper.shape(mText);
 		} catch (ArabicShapingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return mText;
-		/*if (mText.length()==0) return mText;
-		
-		if (debugG) System.out.println("we're in string, string: " + mText);
-		String shaped = mText;
-		//if (ArShaper.hasArabChars(mText)) {
-			ArShaper2 arShaper = new ArShaper2(); 
-			shaped = arShaper.nativeShape(mText, mText.length(), 1);// }
-		if (debugG) System.out.println("and returning: " + shaped);
-
-		return shaped;*/
 
 	}
 
@@ -171,18 +144,9 @@ public class ArShaper {
 		try {
 			arShaper.shape(textToConvert, start, end-start);
 		} catch (ArabicShapingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return String.copyValueOf(textToConvert);
-		/*String shaped = mText.substring(0, end); //y6b never uses "start"
-		//if (ArShaper.hasArabChars(shaped)) {
-			ArShaper2 arShaper = new ArShaper2();
-			shaped = arShaper.nativeShape(shaped, end-0, 1); //y6b never uses "start"
-		//}
-		//if (debugG) System.out.println("and returning: " + arShaper.nativeShape(mText.substring(0, end), end-start, 1));
-		return shaped; */
-
 
 	}
 
@@ -202,12 +166,9 @@ public class ArShaper {
 			String prt = String.copyValueOf(text,index,count);
 			System.out.println(prt);
 			System.out.println(count);
-
-			//Thread.dumpStack();
 		}
 
 		boolean containsArabic = false;
-		//int textLength = count;
 
 		for(int chk=index;chk<count;chk++){
 			if ( Character.UnicodeBlock.of(text[chk]) == Character.UnicodeBlock.ARABIC ||
@@ -239,16 +200,16 @@ public class ArShaper {
 
 		}
 		
+		
 		ArabicShaping arShaper = new ArabicShaping(ArabicShaping.LETTERS_SHAPE |
-				ArabicShaping.LAMALEF_AUTO | ArabicShaping.TEXT_DIRECTION_VISUAL_LTR);
+				ArabicShaping.LAMALEF_NEAR | ArabicShaping.TEXT_DIRECTION_VISUAL_LTR);
 		try {
 			arShaper.shape(text, index, count);
 		} catch (ArabicShapingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		if (debugG) System.out.println("and returning: " + new String(text, index, count));
+		if (debugG) System.out.println("shapetext returning: " + new String(text, index, count));
 	}
 
 	/**
@@ -315,18 +276,6 @@ public class ArShaper {
 			return ArShaper.doReversing2(text, start, end);
 
 		} // end of check for android.text
-
-		//if (debugG) System.out.println("and returning: " + String.copyValueOf(shaped));
-
-		/*if (myDebug) System.out.println("it is styled text after all");
-		ArabicShaping arShaper = new ArabicShaping(shapingFlags);
-		String shaped = null;
-		try {
-			shaped = arShaper.shape(text);
-		} catch (ArabicShapingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 		
 		return text;	
 
@@ -500,20 +449,11 @@ public class ArShaper {
 
 		} // end of first for loop
 
-		//DONE: must take care of text so that its copied into (use stringbuffer)
-		//ArShaper2 arShaper = new ArShaper2();
-		//String toShape = new String(text).substring(index, index+count);
-		//text = arShaper.nativeShape(toShape, count, 2).toCharArray();
-		
-		//ArShaper2.nativeShape(text, index, count, 2);
-		
-
 		ArabicShaping arShaper = new ArabicShaping(ArabicShaping.LETTERS_SHAPE |
-				ArabicShaping.LAMALEF_AUTO | ArabicShaping.TEXT_DIRECTION_VISUAL_LTR);
+				ArabicShaping.LAMALEF_NEAR | ArabicShaping.TEXT_DIRECTION_VISUAL_LTR);
 		try {
 			arShaper.shape(text, index, count);
 		} catch (ArabicShapingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -578,28 +518,17 @@ public class ArShaper {
 
 		}//end of first for loop
 
-		//ArShaper2 arShaper = new ArShaper2();
-		//String toShape = new String(shaped).substring(start, end);
-		//ArShaper2.nativeShape(shaped, start, end-start, 2);
 		ArabicShaping arShaper = new ArabicShaping(ArabicShaping.LETTERS_SHAPE |
-				ArabicShaping.LAMALEF_AUTO | ArabicShaping.TEXT_DIRECTION_VISUAL_LTR);
-		if (myDebug) {
-			System.out.println("mydebug: before shaping we have : \"" + 
-					String.copyValueOf(shaped) + "\"");
-		}
+				ArabicShaping.LAMALEF_NEAR | ArabicShaping.TEXT_DIRECTION_VISUAL_LTR);
+				
 		try {
 			arShaper.shape(shaped, start, end-start);
 		} catch (ArabicShapingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (myDebug) {
-			System.out.println("mydebug: after shaping we have: \"" + 
-					String.copyValueOf(shaped) + "\"");
-		}
+		
 		
 		return String.copyValueOf(shaped);
-		//return String.copyValueOf(arShaper.nativeShape(toShape, end-start, 2).toCharArray());
 	}
 
 }

@@ -32,7 +32,7 @@ GraphicsOperations ,GetCharsDraw
 {
 
 
-	private static boolean debugG = true;
+	private static boolean debugG = false;
 
 	/**
 	 * Create a new SpannableStringBuilder with empty contents
@@ -79,39 +79,8 @@ GraphicsOperations ,GetCharsDraw
 		//ArShaper.shapeText(uText,0,count,paint,"drawText,char,1");
 
 		//madmack modification
-		boolean changeText = false;
-		int wrote = 0;
 		if (end-start>0) {
-			/*if (debugG) {
-				System.out.println("in constructor");
-				System.out.println("mText = " + String.copyValueOf(mText));
-				System.out.println("start = " + start + " end-start = " + (end-start) + 
-						"length of mtext is" + mText.length);
-			}*/
-			//start is start of text, u must start from 0  coz thats where mtext starts
-			wrote = ArShaper.shaper(mText, 0, end-start, "SpannableB -- Constructor", true);
-			if (wrote<(end-start) && wrote!=0) {
-				changeText = true;
-				/*srclen = wrote;
-				//might want to redo len = ArrayUtils.idealCharArraySize(srclen + 1);
-				//mText = new char[len];
-				end = start+wrote;
-				mGapStart = srclen;
-				mGapLength = len - srclen;
-				char[] mTexttemp = mText;
-				mText = new char[len];
-				System.arraycopy(mTexttemp, 0, mText, 0, wrote);
-				//TextUtils.getChars(text, start, start+, mText, 0);
-				mTextRaw = new char[len];
-				tmp = new StringBuffer();
-				tmp.append(mText,0,len);
-				tmp.getChars(0,len,mTextRaw,0);*/
-				srclen = wrote;
-				len = ArrayUtils.idealCharArraySize(srclen + 1);
-				end = start+wrote;
-				mGapStart = srclen;
-				mGapLength = len - srclen;
-			}
+			ArShaper.shaper(mText, 0, end-start, "SpannableB -- Constructor", true);
 		}
 
 
@@ -149,10 +118,6 @@ GraphicsOperations ,GetCharsDraw
 			}
 		}
 		
-		if (changeText) {
-			//TODO: not working perfectly, causes FC in twitter
-			change(start, end, text, start, end);
-		}
 	}
 
 	public static SpannableStringBuilder valueOf(CharSequence source) {
@@ -381,10 +346,6 @@ GraphicsOperations ,GetCharsDraw
 	private int change(boolean notify, int start, int end,
 			CharSequence tb, int tbstart, int tbend) {
 
-		//if (debugG) {
-		//	System.out.println("change is called from: ");
-		//	Thread.dumpStack();
-		//}
 		checkRange("replace", start, end);
 		int ret = tbend - tbstart;
 		TextWatcher[] recipients = null;
@@ -454,9 +415,6 @@ GraphicsOperations ,GetCharsDraw
 		//Placing unshaped characters in mText could cause spacing issues (FIXME)
 
 		TextUtils.getChars(tb, tbstart, tbend, mTextRaw, start); 
-
-		boolean doWeErase = false;
-		boolean doWeErase2 = false;
 		
 		//madmack modification
 		//TODO: fix gaps
@@ -482,15 +440,8 @@ GraphicsOperations ,GetCharsDraw
 				int endShaping = (indexEnd==-1)?end:indexEnd;
 				if ((mGapStart) < endShaping ) endShaping = mGapStart;
 				if (debugG) System.out.println("trying to shape text: " + new String(mText, startShaping, endShaping-startShaping));
-				int noShapedChar = ArShaper.shaper(mText, startShaping, endShaping-startShaping, "SpannableSB -- reshaping word", true);
-				if (noShapedChar<(endShaping-startShaping)) { //must adjust array due to lamalef
-					if (debugG) System.out.println("seems we have to replace some text due to resizing");
-					doWeErase = true;
-				} 
-			} else {
-				if (debugG) System.out.println("we're erasing 2");
-				doWeErase2 = true;
-			}
+				ArShaper.shaper(mText, startShaping, endShaping-startShaping, "SpannableSB -- reshaping word", true);
+			} 
 		}
 
 		if (tb instanceof Spanned) {
@@ -515,38 +466,6 @@ GraphicsOperations ,GetCharsDraw
 			}
 		}
 
-
-		if (doWeErase) {
-			//there is still a problem here, lamalef doesnt get redrawn at lam
-			if (debugG) System.out.println("doWeErase = true and we're inserting " +
-					String.copyValueOf(mText).substring(start-1, start) + " at " +
-					(start-1));
-			change(false, start-1, start+1, "", 0, 0); //removing alef and replacing with lamalef
-			//sendTextChange(recipients, start-1, 1, 0);
-			//sendTextHasChanged(recipients);
-			change(false, start-1, start-1, String.copyValueOf(mText).substring(start-1, start), 0, 1);
-			sendTextChange(recipients, start-1, 1, 1);
-			sendTextHasChanged(recipients);
-			return 0;
-		} else if (doWeErase2) {
-			int noShapedChars = ArShaper.shaper(mText, start, tbend-tbstart, "SpannableSB -- change()", true);
-			if (noShapedChars!=tbdiff && noShapedChars!=0) {
-				if (debugG) System.out.println("tbdiff = " + tbdiff + " and shaped chars = " + noShapedChars);
-				if (debugG) System.out.println("Attempting to change from " + start + "-" +
-						(start+tbdiff) + " from string 0-" + noShapedChars);
-				change(
-						false,
-						start, 
-						start+tbdiff, //replace content of whatever we already have
-						(CharSequence)String.copyValueOf(mText), 
-						start, 
-						start+noShapedChars);
-				if (recipients!=null) {sendTextChange(recipients, start, end-start, noShapedChars);
-				sendTextHasChanged(recipients);}
-				//return noShapedChars;
-				ret = noShapedChars;
-			}
-		}
 
 		// no need for span fixup on pure insertion
 		if (tbend > tbstart && end - start == 0) {
@@ -1096,6 +1015,7 @@ GraphicsOperations ,GetCharsDraw
 					dest, destoff + (mGapStart - start),
 					end - mGapStart);
 		}
+				
 	}
 
 	/**Arabic Shaping

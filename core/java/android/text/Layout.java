@@ -39,6 +39,7 @@ import android.view.KeyEvent;
  */
 public abstract class Layout {
     private static final boolean DEBUG = false;
+    private static final boolean myDebug = true;
     private static final ParagraphStyle[] NO_PARA_SPANS =
         ArrayUtils.emptyArray(ParagraphStyle.class);
 
@@ -367,9 +368,22 @@ public abstract class Layout {
                 // XXX: assumes there's nothing additional to be done
                 c.drawText(buf, start, end, x, lbaseline, paint);
             } else {
+            	
+            	//int length = ArShaper.shapedLength(buf.toString().toCharArray(), start, end-start);
+            	
+            	//if (myDebug) { System.out.print("Layout is trying to draw: \"");
+            	//	for (int h=start; h<start+length; h++) {
+            	//		System.out.print(buf.charAt(h) + " ");
+            	//	}
+            	//	System.out.print("\" but we know it doesn't matter\n");
+            	//}
+            	
+            	//drawText(c, buf, start, start+length, dir, directions,
+                 //       x, ltop, lbaseline, lbottom, paint, mWorkPaint,
+                  //     hasTab, spans);
                 drawText(c, buf, start, end, dir, directions,
-                    x, ltop, lbaseline, lbottom, paint, mWorkPaint,
-                    hasTab, spans);
+                   x, ltop, lbaseline, lbottom, paint, mWorkPaint,
+                  hasTab, spans);
             }
         }
     }

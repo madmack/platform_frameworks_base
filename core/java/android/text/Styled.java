@@ -30,6 +30,9 @@ import android.text.style.ReplacementSpan;
  */
 public class Styled
 {
+	
+	private static boolean debugG = true;
+	
     /**
      * Draws and/or measures a uniform run of text on a single line. No span of
      * interest should start or end in the middle of this run (if not
@@ -295,6 +298,7 @@ public class Styled
             // XXX: if dir and runIsRtl were not the same, this would draw
             // spans in the wrong order, but no one appears to call it this
             // way.
+            if (debugG) System.out.println("Spans " + i + ":" + sp.subSequence(i, next));
             x += drawUniformRun(canvas, sp, i, next, dir, runIsRtl,
                   x, top, y, bottom, fmi, paint, workPaint,
                   needWidth || next != end);

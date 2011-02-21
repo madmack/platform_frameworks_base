@@ -29,6 +29,7 @@ extends CharSequence
      * Exactly like String.getChars(): copy chars <code>start</code>
      * through <code>end - 1</code> from this CharSequence into <code>dest</code>
      * beginning at offset <code>destoff</code>.
+     * it returns number of characters to draw
      */
     public void getCharsDraw(int start, int end, char[] dest, int destoff);
 

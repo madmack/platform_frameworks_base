@@ -1253,7 +1253,8 @@ public class Canvas {
 		if(debugG)
 		{System.out.println("Before shaping in drawText,char :"+ 
 					String.copyValueOf(text,index,count));
-		System.out.println(text.length);}
+		System.out.println(text.length);
+		Thread.dumpStack();}
 
 	
 	
@@ -1413,13 +1414,31 @@ public class Canvas {
             else {
     		
                 char[] buf = TemporaryBuffer.obtain(end - start);
+                
+                //TextUtils.getChars(text, start, end, buf, 0);
+                //ArShaper.shapeText(buf, 0, end-start, "drawText,charseq,3,last");
+                
+                //arabic
                 TextUtils.getCharsDraw(text, start, end, buf, 0);
-
+                
+                
+                //int length = TextUtils.getCharsDraw(text, start, end, buf, 0);
+                //if (length<(end-start)) {
+                //	char[] newbuf = TemporaryBuffer.obtain(length);
+                //	System.arraycopy(buf, (end-start)-length, newbuf, 0, length);
+                //	drawText(newbuf, 0, length, x, y, paint);
+                //	TemporaryBuffer.recycle(newbuf);
+                //}
     		//Arabic Shaping
     		//ArShaper.shapeText(buf,0,end - start,"drawText,CharSeq,3,last");
     		//
 
-                drawText(buf, 0, end - start, x, y, paint);
+                //madmack
+                //else { drawText(buf, 0, end - start, x, y, paint); }
+                //if ((end-start)>length) {
+                //	drawText(buf, (end-start)-length, length, x, y, paint);
+                //} else
+                	drawText(buf, 0, end-start, x, y, paint);
                 TemporaryBuffer.recycle(buf);
             }
         }

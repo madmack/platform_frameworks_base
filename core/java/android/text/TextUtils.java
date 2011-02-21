@@ -57,6 +57,7 @@ public class TextUtils {
 	
 	//Arabic shaping debug
 	static boolean debugG= false;
+	static boolean myDebug = false;
 
    public static void getChars(CharSequence s, int start, int end,
                                 char[] dest, int destoff) {
@@ -79,7 +80,6 @@ public class TextUtils {
     public static void getCharsDraw(CharSequence s, int start, int end,
                                 char[] dest, int destoff) {
 	Class c = s.getClass();
-
 		if(debugG)
 		{ System.out.println("--getCharsDraw TextUtils,GCD,class is:"+ 
 					c.getName());
@@ -87,16 +87,20 @@ public class TextUtils {
 
 	
 
-        if (c == String.class)		
+        if (c == String.class)	{	
             ((String) s).getChars(start, end, dest, destoff);
-        else if (c == StringBuffer.class)
+        }
+        else if (c == StringBuffer.class) {
             ((StringBuffer) s).getChars(start, end, dest, destoff);
-        else if (c == StringBuilder.class)
+        }
+        else if (c == StringBuilder.class) {
             ((StringBuilder) s).getChars(start, end, dest, destoff);
-        else if (s instanceof GetCharsDraw)
+        }
+        else if (s instanceof GetCharsDraw) {
             ((GetCharsDraw) s).getCharsDraw(start, end, dest, destoff);
+            
+        }
 	else if (s instanceof SpannableStringInternal){
-
 		for (int i = start; i < end; i++)
                 dest[destoff++] = ((GetCharsDraw)s).charAtDraw(i);
 
@@ -520,6 +524,11 @@ public class TextUtils {
     private static class Reverser
     implements CharSequence, GetChars ,GetCharsDraw
     {
+    	
+    	private CharSequence mSource;
+        private int mStart;
+        private int mEnd;
+        
         public Reverser(CharSequence source, int start, int end) {
             mSource = source;
             mStart = start;
@@ -566,6 +575,8 @@ public class TextUtils {
 
 	public void getCharsDraw(int start, int end, char[] dest, int destoff) {
 
+		
+		int ret = end-start;
 		if(debugG)
 		{if ( mSource instanceof SpannableStringInternal)
 			 System.out.println("--getCharsDraw reverser,before getCD SSI:"+ 
@@ -578,7 +589,7 @@ public class TextUtils {
 		System.out.println(mSource.length());}
 
 
-            TextUtils.getCharsDraw(mSource, start + mStart, end + mStart,
+           TextUtils.getCharsDraw(mSource, start + mStart, end + mStart,
                                dest, destoff);
 
 		if(debugG)
@@ -601,11 +612,7 @@ public class TextUtils {
                 dest[destoff + i] = dest[destoff + len - i - 1];
                 dest[destoff + len - i - 1] = tmp;
             }
-        }
-
-        private CharSequence mSource;
-        private int mStart;
-        private int mEnd;
+        }        
     }
 
     /** @hide */

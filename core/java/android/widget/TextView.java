@@ -2778,7 +2778,7 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
             return mCharsRaw[off + mStart];
         }
 
-	public char charAtDraw(int off) {
+        public char charAtDraw(int off) {
             return mChars[off + mStart];
         }
 
@@ -2786,7 +2786,7 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
             return new String(mCharsRaw, mStart, mLength);
         }
 
-	public String toStringDraw() {
+        public String toStringDraw() {
             return new String(mChars, mStart, mLength);
         }
 
@@ -2806,7 +2806,7 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
             System.arraycopy(mCharsRaw, start + mStart, buf, off, end - start);
         }
 
-	public void getCharsDraw(int start, int end, char[] buf, int off) {
+        public void getCharsDraw(int start, int end, char[] buf, int off) {
             if (start < 0 || end < 0 || start > mLength || end > mLength) {
                 throw new IndexOutOfBoundsException(start + ", " + end);
             }

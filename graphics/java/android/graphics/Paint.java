@@ -19,6 +19,7 @@ package android.graphics;
 import android.text.TextUtils;
 import android.text.SpannableString;
 import android.text.SpannedString;
+//import android.text.SpannableStringInternal;
 import android.text.GraphicsOperations;
 
 /**
@@ -39,6 +40,8 @@ public class Paint {
     private boolean     mHasCompatScaling;
     private float       mCompatScaling;
     private float       mInvCompatScaling;
+    
+    private static boolean myDebug = true;
     
     private static final Style[] sStyleArray = {
         Style.FILL, Style.STROKE, Style.FILL_AND_STROKE
@@ -998,6 +1001,8 @@ public class Paint {
      * @return      The width of the text
      */
     public float measureText(char[] text, int index, int count) {
+	//Thread.dumpStack();
+
         if (!mHasCompatScaling) return native_measureText(text, index, count);
         final float oldSize = getTextSize();
         setTextSize(oldSize*mCompatScaling);
@@ -1017,6 +1022,8 @@ public class Paint {
      * @return      The width of the text
      */
     public float measureText(String text, int start, int end) {
+	//Thread.dumpStack();
+
         if (!mHasCompatScaling) return native_measureText(text, start, end);
         final float oldSize = getTextSize();
         setTextSize(oldSize*mCompatScaling);
@@ -1034,6 +1041,8 @@ public class Paint {
      * @return      The width of the text
      */
     public float measureText(String text) {
+	//Thread.dumpStack();
+
         if (!mHasCompatScaling) return native_measureText(text);
         final float oldSize = getTextSize();
         setTextSize(oldSize*mCompatScaling);
@@ -1056,17 +1065,23 @@ public class Paint {
         if (text instanceof String) {
             return measureText((String)text, start, end);
         }
-        if (text instanceof SpannedString ||
-            text instanceof SpannableString) {
-            return measureText(text.toString(), start, end);
+        if (text instanceof SpannableString) {
+            return measureText(((SpannableString)text).toStringDraw(), start, end);
+        }
+
+	if (text instanceof SpannedString) {
+            return measureText(((SpannedString)text).toStringDraw(), start, end);
         }
         if (text instanceof GraphicsOperations) {
             return ((GraphicsOperations)text).measureText(start, end, this);
         }
 
         char[] buf = TemporaryBuffer.obtain(end - start);
-        TextUtils.getChars(text, start, end, buf, 0);
+        //int length = 
+        	TextUtils.getCharsDraw(text, start, end, buf, 0);
+        //if (myDebug) System.out.println("Paint is measuring length: " + length);
         float result = measureText(buf, 0, end - start);
+        //float result = measureText(buf, 0, length);
         TemporaryBuffer.recycle(buf);
         return result;
     }
@@ -1132,7 +1147,7 @@ public class Paint {
         char[] buf = TemporaryBuffer.obtain(end - start);
         int result;
 
-        TextUtils.getChars(text, start, end, buf, 0);
+        TextUtils.getCharsDraw(text, start, end, buf, 0);
 
         if (measureForwards) {
             result = breakText(buf, 0, end - start, maxWidth, measuredWidth);
@@ -1222,9 +1237,12 @@ public class Paint {
         if (text instanceof String) {
             return getTextWidths((String) text, start, end, widths);
         }
-        if (text instanceof SpannedString ||
-            text instanceof SpannableString) {
-            return getTextWidths(text.toString(), start, end, widths);
+        if (text instanceof SpannedString ) {
+            return getTextWidths(((SpannedString)text).toStringDraw(), start, end, widths);
+        }
+
+	 if (text instanceof SpannableString) {
+            return getTextWidths(((SpannableString)text).toStringDraw(), start, end, widths);
         }
         if (text instanceof GraphicsOperations) {
             return ((GraphicsOperations) text).getTextWidths(start, end,
@@ -1232,7 +1250,7 @@ public class Paint {
         }
 
         char[] buf = TemporaryBuffer.obtain(end - start);
-    	TextUtils.getChars(text, start, end, buf, 0);
+    	TextUtils.getCharsDraw(text, start, end, buf, 0);
     	int result = getTextWidths(buf, 0, end - start, widths);
         TemporaryBuffer.recycle(buf);
     	return result;
@@ -1414,4 +1432,3 @@ public class Paint {
                                 char[] text, int index, int count, Rect bounds);
     private static native void finalizer(int nativePaint);
 }
-

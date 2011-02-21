@@ -39,7 +39,7 @@ import android.view.KeyEvent;
  */
 public abstract class Layout {
     private static final boolean DEBUG = false;
-    private static final boolean myDebug = true;
+    private static final boolean myDebug = false;
     private static final ParagraphStyle[] NO_PARA_SPANS =
         ArrayUtils.emptyArray(ParagraphStyle.class);
 

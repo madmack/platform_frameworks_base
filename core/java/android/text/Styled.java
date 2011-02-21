@@ -31,7 +31,7 @@ import android.text.style.ReplacementSpan;
 public class Styled
 {
 	
-	private static boolean debugG = true;
+	private static boolean debugG = false;
 	
     /**
      * Draws and/or measures a uniform run of text on a single line. No span of

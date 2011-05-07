@@ -20,6 +20,7 @@ import android.text.TextUtils;
 import android.text.SpannableString;
 import android.text.SpannedString;
 import android.text.GraphicsOperations;
+import android.text.util.RTLTextUtils;
 import android.util.Log;
 
 /**
@@ -1000,7 +1001,7 @@ public class Paint {
      */
     public float measureText(char[] text, int index, int count) {
     	
-    	char[] text2 = TextUtils.processBidi(text, index, index+count);
+    	char[] text2 = RTLTextUtils.reshapeArabic(text, index, index+count);
     	
         if (!mHasCompatScaling) return native_measureText(text2, index, count);
         final float oldSize = getTextSize();
@@ -1022,7 +1023,7 @@ public class Paint {
      */
     public float measureText(String text, int start, int end) {
     	
-    	String text2 = TextUtils.processBidi(text, start, end);
+    	String text2 = RTLTextUtils.reshapeArabic(text, start, end);
     	
     	if (!mHasCompatScaling) return native_measureText(text2, start, end);
         final float oldSize = getTextSize();
@@ -1043,7 +1044,7 @@ public class Paint {
     public float measureText(String text) {
     	
     	//doing being here ruins alignment
-    	String text2 = TextUtils.processBidi(text);
+    	String text2 = RTLTextUtils.reshapeArabic(text);
     	
     	//Log.e("MeasureTextA", "len=" + text.length());
     	//Log.e("MeasureTextB", "len=" + text2.length());
@@ -1105,7 +1106,7 @@ public class Paint {
     public int breakText(char[] text, int index, int count,
                                 float maxWidth, float[] measuredWidth) {
     	
-    	char[] text2 = TextUtils.processBidi(text);
+    	char[] text2 = RTLTextUtils.reshapeArabic(text);
     	
         if (!mHasCompatScaling) {
             return native_breakText(text2, index, count, maxWidth, measuredWidth);
@@ -1180,7 +1181,7 @@ public class Paint {
     public int breakText(String text, boolean measureForwards,
                                 float maxWidth, float[] measuredWidth) {
     	
-    	String text2 = TextUtils.processBidi(text);
+    	String text2 = RTLTextUtils.reshapeArabic(text);
     	
         if (!mHasCompatScaling) {
             return native_breakText(text2, measureForwards, maxWidth, measuredWidth);
@@ -1214,7 +1215,7 @@ public class Paint {
             throw new ArrayIndexOutOfBoundsException();
         }
         
-        char[] text2 = TextUtils.processBidi(text, index, index+count);
+        char[] text2 = RTLTextUtils.reshapeArabic(text, index, index+count);
         
         if (!mHasCompatScaling) {
             return native_getTextWidths(mNativePaint, text2, index, count, widths);
@@ -1279,7 +1280,7 @@ public class Paint {
             throw new ArrayIndexOutOfBoundsException();
         }
         
-        String text2 = TextUtils.processBidi(text, start, end);
+        String text2 = RTLTextUtils.reshapeArabic(text, start, end);
         
         if (!mHasCompatScaling) {
             return native_getTextWidths(mNativePaint, text2, start, end, widths);
@@ -1326,7 +1327,7 @@ public class Paint {
             throw new ArrayIndexOutOfBoundsException();
         }
         
-        char[] text2 = TextUtils.processBidi(text, index, index+count);
+        char[] text2 = RTLTextUtils.processBidi(text, index, index+count);
         
         native_getTextPath(mNativePaint, text2, index, count, x, y, path.ni());
     }
@@ -1350,7 +1351,7 @@ public class Paint {
             throw new IndexOutOfBoundsException();
         }
         
-        String text2 = TextUtils.processBidi(text, start, end);
+        String text2 = RTLTextUtils.processBidi(text, start, end);
         
         native_getTextPath(mNativePaint, text2, start, end, x, y, path.ni());
     }
@@ -1373,7 +1374,7 @@ public class Paint {
             throw new NullPointerException("need bounds Rect");
         }
         
-        String text2 = TextUtils.processBidi(text, start, end);
+        String text2 = RTLTextUtils.processBidi(text, start, end);
         
         nativeGetStringBounds(mNativePaint, text2, start, end, bounds);
     }
@@ -1396,7 +1397,7 @@ public class Paint {
             throw new NullPointerException("need bounds Rect");
         }
         
-        char[] text2 = TextUtils.processBidi(text, index, index+count);
+        char[] text2 = RTLTextUtils.processBidi(text, index, index+count);
         
         nativeGetCharArrayBounds(mNativePaint, text2, index, count, bounds);
     }

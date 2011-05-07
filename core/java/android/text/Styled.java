@@ -20,6 +20,7 @@ import android.graphics.Paint;
 import android.text.style.CharacterStyle;
 import android.text.style.MetricAffectingSpan;
 import android.text.style.ReplacementSpan;
+import android.text.util.RTLTextUtils;
 
 /**
  * This class provides static methods for drawing and measuring styled text,
@@ -88,10 +89,10 @@ public class Styled
 
             if (runIsRtl) {
                 // if the text has RTL characters then it will be reversed when mirrored:
-                if (TextUtils.hasRTLCharacters(text,start,end))
+                if (RTLTextUtils.hasRTLCharacters(text,start,end))
                     tmp = text.subSequence(start,end);
                 else // otherwise we need to reverse it here:
-                    tmp = TextUtils.getMirror(text, start, end);
+                    tmp = TextUtils.getReverse(text, start, end);
 
                 tmpstart = 0;
                 // XXX: assumes getReverse doesn't change the length of the text
@@ -260,10 +261,10 @@ public class Styled
             if (runIsRtl) {
                 CharSequence tmp;
                 // if the text has RTL characters then it will be reversed when mirrored:
-                if (TextUtils.hasRTLCharacters(text,start,end))
+                if (RTLTextUtils.hasRTLCharacters(text,start,end))
                     tmp = text.subSequence(start,end);
                 else // otherwise we need to reverse it here:
-                    tmp = TextUtils.getMirror(text, start, end);
+                    tmp = TextUtils.getReverse(text, start, end);
 
                 // XXX: this assumes getReverse doesn't tweak the length of
                 // the text

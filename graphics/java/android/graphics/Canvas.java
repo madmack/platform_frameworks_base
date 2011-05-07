@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import android.text.SpannedString;
 import android.text.SpannableString;
 import android.text.GraphicsOperations;
+import android.text.util.RTLTextUtils;
 import android.util.DisplayMetrics;
 
 import javax.microedition.khronos.opengles.GL;
@@ -1248,7 +1249,7 @@ public class Canvas {
             throw new IndexOutOfBoundsException();
         }
 
-        char[] text2 = TextUtils.processBidi(text, index, index+count);
+        char[] text2 = RTLTextUtils.processBidi(text, index, index+count);
         native_drawText(mNativeCanvas, text2, index, count, x, y,
                         paint.mNativePaint);
     }
@@ -1264,7 +1265,7 @@ public class Canvas {
       */
      public void drawText(String text, float x, float y, Paint paint) {
         //this calls the native function from patched libandroid_runtime.so
-     	native_drawText (TextUtils.processBidi(text), x, y, paint);
+     	native_drawText (RTLTextUtils.processBidi(text), x, y, paint);
      }
 
     /**
@@ -1276,7 +1277,7 @@ public class Canvas {
      * @param y     The y-coordinate of the origin of the text being drawn
      * @param paint The paint used for the text (e.g. color, size, style)
      */
-    private native void native_drawText(String text, float x, float y, Paint paint);
+    public native void native_drawText(String text, float x, float y, Paint paint);
 
     /**
      * Draw the text, with origin at (x,y), using the specified paint.
@@ -1295,7 +1296,7 @@ public class Canvas {
             throw new IndexOutOfBoundsException();
         }
 
-        String text2 = TextUtils.processBidi(text, start, end);
+        String text2 = RTLTextUtils.processBidi(text, start, end);
         native_drawText(mNativeCanvas, text2, start, end, x, y,
                         paint.mNativePaint);
     }
@@ -1317,7 +1318,7 @@ public class Canvas {
                          float y, Paint paint) {
         if (text instanceof String || text instanceof SpannedString ||
             text instanceof SpannableString) {
-            String text2 = TextUtils.processBidi(text.toString(), start, end);
+            String text2 = RTLTextUtils.processBidi(text.toString(), start, end);
             native_drawText(mNativeCanvas, text2, start, end, x, y,
                             paint.mNativePaint);
         }
@@ -1349,7 +1350,7 @@ public class Canvas {
         if (index < 0 || index + count > text.length || (index+count)*2 > pos.length) {
             throw new IndexOutOfBoundsException();
         }
-        char[] text2 = TextUtils.processBidi(text, index, index+count);
+        char[] text2 = RTLTextUtils.processBidi(text, index, index+count);
         native_drawPosText(mNativeCanvas, text2, index, count, pos,
                            paint.mNativePaint);
     }
@@ -1366,7 +1367,7 @@ public class Canvas {
         if (text.length()*2 > pos.length) {
             throw new ArrayIndexOutOfBoundsException();
         }
-        String text2 = TextUtils.processBidi(text);
+        String text2 = RTLTextUtils.processBidi(text);
         native_drawPosText(mNativeCanvas, text2, pos, paint.mNativePaint);
     }
 
@@ -1388,7 +1389,7 @@ public class Canvas {
         if (index < 0 || index + count > text.length) {
             throw new ArrayIndexOutOfBoundsException();
         }
-        char[] text2 = TextUtils.processBidi(text, index, index+count);
+        char[] text2 = RTLTextUtils.processBidi(text, index, index+count);
         native_drawTextOnPath(mNativeCanvas, text2, index, count,
                               path.ni(), hOffset, vOffset,
                               paint.mNativePaint);
@@ -1410,7 +1411,7 @@ public class Canvas {
     public void drawTextOnPath(String text, Path path, float hOffset,
                                float vOffset, Paint paint) {
         if (text.length() > 0) {
-            String text2 = TextUtils.processBidi(text);
+            String text2 = RTLTextUtils.processBidi(text);
             native_drawTextOnPath(mNativeCanvas, text2, path.ni(),
                                   hOffset, vOffset, paint.mNativePaint);
         }
